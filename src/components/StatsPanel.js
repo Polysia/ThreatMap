@@ -52,7 +52,7 @@ const StatsPanel = ({ isSidebarOpen, toggleSidebar }) => {
       <PanelContainer isOpen={isSidebarOpen}>
         <QuoteBox>SAVE YOURSELF FROM CYBER ATTACK</QuoteBox>
         <StatBox
-          title="Types of Cyber Attacks"
+          title="TYPES OF CYBER ATTACKS"
           items={[
             { name: 'Phishing', color: 'red' },
             { name: 'DDoS', color: 'yellow' },
@@ -60,7 +60,7 @@ const StatsPanel = ({ isSidebarOpen, toggleSidebar }) => {
           ]}
         />
         <StatBox
-          title="Targeted Nations"
+          title="TARGETED NATIONS"
           items={[
             { name: 'Ethiopia', flag: '/ethiopia.png' },
             { name: 'Mongolia', flag: '/mongolia.png' },
@@ -69,7 +69,7 @@ const StatsPanel = ({ isSidebarOpen, toggleSidebar }) => {
           ]}
         />
         <StatBox
-          title="Top Targeted Industries"
+          title="TARGETED INDUSTRIES"
           items={[
             { name: 'Education', flag: '/education.png' },
             { name: 'Government', flag: '/govt.png' },
