@@ -1,32 +1,42 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useContext, useEffect, useCallback, useMemo } from 'react';
 import * as d3 from 'd3';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faPlus, faMinus } from '@fortawesome/free-solid-svg-icons';
-import './Sidebar.css';
+import { faPlus, faMinus, faArrowRight, faArrowLeft } from '@fortawesome/free-solid-svg-icons';
 import { debounce } from 'lodash';
+import { ThemeContext } from './ThemeContext';
 
-const Sidebar = ({ handleSpeedChange }) => {
+const Threatpanel = ({ handleSpeedChange, isSidebarOpen, toggleSidebar }) => {
     const [attackSpeed, setAttackSpeed] = useState(1500);
     const [data, setData] = useState([]);
-    const debouncedHandleSpeedChange = useCallback(debounce((newSpeed) => {
-        handleSpeedChange(newSpeed);
-    }, 500), [handleSpeedChange]); 
+    const { theme } = useContext(ThemeContext);
+    
+    const debouncedHandleSpeedChange = useMemo(() => 
+        debounce((newSpeed) => {
+            handleSpeedChange(newSpeed);
+        }, 500), 
+    [handleSpeedChange]);
 
-    const increaseSpeed = () => {
+    useEffect(() => {
+        return () => {
+            debouncedHandleSpeedChange.cancel();
+        };
+    }, [debouncedHandleSpeedChange]);
+
+    const increaseSpeed = useCallback(() => {
         setAttackSpeed(prevSpeed => {
             const newSpeed = Math.max(500, prevSpeed - 200);
             debouncedHandleSpeedChange(newSpeed);
             return newSpeed;
         });
-    };
+    }, [debouncedHandleSpeedChange]);
 
-    const decreaseSpeed = () => {
+    const decreaseSpeed = useCallback(() => {
         setAttackSpeed(prevSpeed => {
             const newSpeed = prevSpeed + 200;
             debouncedHandleSpeedChange(newSpeed);
             return newSpeed;
         });
-    };
+    }, [debouncedHandleSpeedChange]);
 
     useEffect(() => {
         fetch('/data.json')
@@ -82,39 +92,37 @@ const Sidebar = ({ handleSpeedChange }) => {
         svg.append("g")
           .call(d3.axisLeft(y).ticks(5).tickFormat(d3.format(".2s")));
 
-        svg.append("text")
-          .attr("x", width / 2)
-          .attr("y", -10)
-          .attr("text-anchor", "middle")
-          .attr("class", "chart")
-          .text("Recent Daily Attacks");
     }, [data]);
 
     return (
-        <div id="leftSidebar">
-            <h2>Threat Data</h2>
-            <b>Recent Daily Attacks:</b>
-            <div id="chart"></div> 
-            <ul id="threatList">
-                <li>
-                    <b>Attack Speed:</b>
-                    <div className="speed-controls fixed-controls">
-                        <button onClick={decreaseSpeed}>
-                            <FontAwesomeIcon icon={faMinus} /> 
-                        </button>
-                        <span>{attackSpeed} ms</span>
-                        <button onClick={increaseSpeed}>
-                            <FontAwesomeIcon icon={faPlus} />
-                        </button>
-                    </div>
-                </li>
-                <li>
-                    <b>Active Attacks:</b>
+        <div>
+            <button className="toggle-button" onClick={toggleSidebar} style={{ left: isSidebarOpen ? '230px' : '0' }}>
+                <FontAwesomeIcon icon={isSidebarOpen ? faArrowLeft : faArrowRight} />
+            </button>
+            <div id="leftSidebar" className={theme} style={{ display: isSidebarOpen ? 'block' : 'none' }}>
+                <h2>THREAT DATA</h2>
+                <div id="chart"></div>
+                <ul id="threatList">
+                    <li>
+                        <b>ATTACK SPEED</b>
+                        <div className="speed-controls">
+                            <button onClick={decreaseSpeed}>
+                                <FontAwesomeIcon icon={faMinus} />
+                            </button>
+                            <span>{attackSpeed} ms</span>
+                            <button onClick={increaseSpeed}>
+                                <FontAwesomeIcon icon={faPlus} />
+                            </button>
+                        </div>
+                    </li>
+                    <li>
+                    <b>ACTIVE ATTACKS</b>
                     <ul id="activeAttacksList"></ul> 
                 </li>
-            </ul>
+                </ul>
+            </div>
         </div>
     );
 };
 
-export default Sidebar;
+export default Threatpanel;
